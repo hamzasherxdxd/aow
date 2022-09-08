@@ -31,23 +31,23 @@ const Dashboard = () => (
         >
           <Grid
             item
-            lg={3}
+            lg={4}
             sm={6}
-            xl={3}
+            xl={4}
             xs={12}
           >
             <Budget />
           </Grid>
           <Grid
             item
-            xl={3}
-            lg={3}
+            xl={4}
+            lg={4}
             sm={6}
             xs={12}
           >
             <TotalCustomers />
           </Grid>
-          <Grid
+          {/* <Grid
             item
             xl={3}
             lg={3}
@@ -55,11 +55,11 @@ const Dashboard = () => (
             xs={12}
           >
             <TasksProgress />
-          </Grid>
+          </Grid> */}
           <Grid
             item
-            xl={3}
-            lg={3}
+            xl={4}
+            lg={4}
             sm={6}
             xs={12}
           >
@@ -74,7 +74,7 @@ const Dashboard = () => (
           >
             <Sales />
           </Grid>
-          <Grid
+          {/* <Grid
             item
             lg={4}
             md={6}
@@ -82,7 +82,7 @@ const Dashboard = () => (
             xs={12}
           >
             <TrafficByDevice sx={{ height: '100%' }} />
-          </Grid>
+          </Grid> */}
           <Grid
             item
             lg={4}

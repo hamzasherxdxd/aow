@@ -1,18 +1,18 @@
 import Head from "next/head";
 import { Box, Container } from "@mui/material";
-import { CustomerListResults } from "../components/customer/customer-list-results";
-import { CustomerListToolbar } from "../components/customer/customer-list-toolbar";
+import { OrderListResults } from "../components/orders/order-list-results";
+import { OrderListToolbar } from "../components/orders/orders-list-toolbar";
 import { DashboardLayout } from "../components/dashboard-layout";
 // import { customers } from "../__mocks__/customers";
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-const Customers = () => {
+const Orders = () => {
   
   return (
     <>
       <Head>
-        <title>Customers | Material Kit</title>
+        <title>Orders</title>
       </Head>
       <Box
         component="main"
@@ -22,15 +22,14 @@ const Customers = () => {
         }}
       >
         <Container maxWidth={false}>
-          <CustomerListToolbar />
+          <OrderListToolbar />
           <Box sx={{ mt: 3 }}>
-            <CustomerListResults />
+            <OrderListResults />
           </Box>
         </Container>
       </Box>
     </>
   );
 };
-
-Customers.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
-export default Customers;
+  Orders.getLayout = (page) => <DashboardLayout>{page}</DashboardLayout>;
+export default Orders;
