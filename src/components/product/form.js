@@ -13,13 +13,17 @@ const Form = (props) => {
   const [optionFields, setOptionFields] = useState([]);
   const fieldOptions = [];
   const [editOption, setEditOption] = useState(false);
-  const [editedChoice, setEditedChoice] = useState({
-    text: "",
-    price: "",
-  });
-  const [editedOption, setEditedOption] = useState({
+  const [fieldIds, setFieldIds] = useState([]);
+  const [form, setForm] = useState();
+  const editedOptionName = {
+    id: "",
     label: "",
-  });
+  };
+  const editedOptionPrice = {
+    id: "",
+    price: "",
+  };
+
   const fetchOptions = async (id) => {
     if (!id) return;
     const options = {
@@ -31,12 +35,13 @@ const Form = (props) => {
     };
 
     await axios(options).then((response) => {
+      console.log(response.data);
+      setForm(response.data);
       for (let i = 0; i < response.data.fields.length; i++) {
         if (response.data.fields[i].type === "option") {
           fieldOptions.push(response.data.fields[i]);
         }
       }
-      console.log(fieldOptions);
       setOptionFields(fieldOptions);
       setIsLoading(false);
     });
@@ -46,18 +51,79 @@ const Form = (props) => {
     await fetchOptions(props.formId);
   }, [props.formId]);
 
-  const handleChange = (event, index, choice, option) => {
-    console.log("Text: " + choice.text);
-    console.log("Price: " + choice.price);
-    console.log("Option Index: " + index);
-    console.log("Option Id: " + option[index].id);
-    console.log("Option Name: " + option[index].label);
-    console.log("Edited Value: " + event.target.value);
-    console.log(editedChoice);
+  const handleChangeName = (event, index, choice, option) => {
+    event.preventDefault();
+    editedOptionName = {
+      id: option[index].id,
+      label: event.target.value,
+    };
   };
+
+  const handleChangePrice = (event, index, choice, option) => {
+    event.preventDefault();
+    editedOptionPrice = {
+      id: option[index].id,
+      price: event.target.value,
+    };
+  };
+
+  const handleSubmit = () => {
+    const params = {
+      consumer_key: "ck_5f706cd5ee6a48fbe7933f2601276d16942a6e9b",
+      consumer_secret: "cs_b9361130487ffc3d0bd056e15f9ae5334635696c",
+    };
+    console.log(editedOptionName);
+    console.log(editedOptionPrice);
+    console.log(form.fields);
+    let inputIndex = 0;
+    let fieldIndex = 0;
+    form.fields.forEach((field, index) => {
+      if (field.type === "option") {
+        if (editedOptionName.id === "") {
+          if (field.id === parseInt(editedOptionPrice.id.split(".")[0])) {
+            field.inputs.forEach((input, index) => {
+              if (input.id === editedOptionName.id) {
+                inputIndex = index;
+              }
+            });
+            fieldIndex = index;
+          }
+        } else {
+          if (field.id === parseInt(editedOptionName.id.split(".")[0])) {
+            field.inputs.forEach((input, index) => {
+              if (input.id === editedOptionName.id) {
+                inputIndex = index;
+              }
+            });
+            fieldIndex = index;
+          }
+        }
+      }
+    });
+    console.log(fieldIndex, inputIndex);
+    if (editedOptionName.label !== "") {
+      form.fields[fieldIndex].inputs[inputIndex].label = editedOptionName.label;
+      form.fields[fieldIndex].choices[inputIndex].text = editedOptionName.label;
+    }
+    if (editedOptionPrice.price !== "") {
+      form.fields[fieldIndex].choices[inputIndex].price = editedOptionPrice.price;
+    }
+    console.log(form.fields[fieldIndex].inputs[inputIndex].name);
+    axios
+      .put(`https://www.andalelatinogrill.com/wp-json/gf/v2/forms/${props.formId}`, form, {
+        params,
+      })
+      .then((reponse) => {
+        console.log(reponse.data);
+      })
+      .catch((error) => {
+        console.log(error.message);
+      });
+    setEditOption(false);
+  };
+
   const RenderViewOptions = (option) => {
     option = option.option;
-    console.log(option);
     return (
       <div>
         {option.choices.map((choice) => {
@@ -74,7 +140,6 @@ const Form = (props) => {
 
   const RenderEditOptions = (option) => {
     option = option.option;
-    // console.log(option.id);
     return (
       <div>
         {option.choices.map((choice, index) => {
@@ -85,23 +150,32 @@ const Form = (props) => {
                 <TextField
                   defaultValue={choice.text}
                   variant="outlined"
-                  onChange={(event) => handleChange(event, index, choice, option.inputs)}
+                  onChange={(event) => handleChangeName(event, index, choice, option.inputs)}
                 />
                 Price:{" "}
                 <TextField
                   defaultValue={choice.price}
                   variant="outlined"
-                  onChange={(event) => handleChange(event, index, choice, option)}
+                  onChange={(event) => handleChangePrice(event, index, choice, option.inputs)}
                 />{" "}
               </Typography>
             </div>
           );
         })}
+        <Button
+          color="primary"
+          variant="contained"
+          onClick={() => {
+            handleSubmit();
+          }}
+        >
+          Submit
+        </Button>
       </div>
     );
   };
 
-  const handleEdit = (e) => {
+  const handleEditButtonPressed = (e) => {
     setEditOption(!editOption);
   };
 
@@ -121,18 +195,22 @@ const Form = (props) => {
                   {editOption ? (
                     <RenderEditOptions option={option} />
                   ) : (
-                    <RenderViewOptions option={option} />
+                    <>
+                      {" "}
+                      <RenderViewOptions option={option} />
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        onClick={(e) => handleEditButtonPressed(e)}
+                      >
+                        Edit
+                      </Button>
+                    </>
                   )}
-                  <Button color="primary" variant="contained" onClick={(e) => handleEdit(e)}>
-                    Edit
-                  </Button>
                 </Accordion>
               );
             })}
           <br />
-          <Button color="primary" variant="contained">
-            Submit
-          </Button>
         </div>
       )}{" "}
     </div>
